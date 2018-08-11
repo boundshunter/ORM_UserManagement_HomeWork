@@ -18,9 +18,6 @@ from django.urls import path, re_path, include
 from cmdb import views
 
 urlpatterns = [
-    path('login/', views.login),
-    path('orm/', views.orm),
-    path('user_info/', views.user_info),
-    path('user_detail/', views.user_detail),
-    path('user_group/', views.group_info),
+    path('business/', views.business),
+    path('host/', views.host),
 ]

@@ -4,34 +4,25 @@ from cmdb import models
 # Create your views here.
 
 
-def login(request):
-    if request.method == "GET":
-        return render(request, 'login.html')
-    elif request.method == "POST":
-        user = request.POST.get('username')
-        pwd = request.POST.get('pwd')
-        obj = models.UserInfo.objects.filter(username=user, password=pwd).first()
-        if obj:
-            return render(request, 'user_info.html')
-        else:
-            return redirect('/cmdb/login/')
-    else:
-        return redirect('/cmdb/login/')
+def business(request):
+    v1 = models.Business.objects.all()
+
+    # v QuerySet
+    # 列表里面都是对象
+    # [obj1(id,caption,code),obj2(..), ..]
+    # return HttpResponse('abc')
+
+    v2 = models.Business.objects.all().values('id', 'caption')
+    # select id,caption from cmdb_business
+    # v1 QuerySet,列表里面元素为字典
+    # [{'id':1,'caption':'运维部'},{},{}]
+
+    v3 = models.Business.objects.all().values_list('id', 'caption')
+    # v3 Queryset
+    # [(1,运维部)，(2,开发部), ..]
+    return render(request, 'business.html', {'v1': v1, 'v2': v2, 'v3': v3})
 
 
-def user_info(request):
-    pass
-
-
-def group_info(request):
-    pass
-
-
-def user_detail(request):
-    pass
-
-
-def orm(request):
-    # models.UserInfo.objects.create(username='admin', password='abc', gender=0, age=25, job='IT')
-    # models.UserInfo.objects.all().delete()
-    return HttpResponse('Data Created Successful.')
+def host(request):
+    v1 = models.Host.objects.all()
+    return render(request, 'host.html', {'v1': v1})
