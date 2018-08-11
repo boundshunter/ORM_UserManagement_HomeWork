@@ -1,0 +1,152 @@
+1.Django 请求声明周期
+	路由系统--> 视图函数(获取模板+数据->渲染) --> 字符串返回给用户
+	
+2、路由系统
+	path   /index/	- > 函数或者类.as_view()
+	re_path  /detail/(\d+)       -> 函数(参数) 或类.as_view()
+	re_path /detail/(?P<nid>\d+) -> 函数(参数) 或类.as_view()(参数)
+	/detail/					 -> include("app01.urls")
+	/detail/	name='a1'		 -> include("app01.urls")
+								 -  视图中 reverse
+								 -  模板中 {% url "a1" %}
+3、视图函数
+	 cbv  类 
+		class Home(views.View):
+			def get(self,request,*args,**kwargs)
+				..
+			
+	 fbv  函数
+		def index(request,*args,**kwargs):
+			..
+								 
+	获取用户请求的数据
+		request.GET.get()
+		request.POST.get()
+		request.FILES.get()
+		# checkbox
+		..............getlist()
+		获取当前请求的url
+		request.path_info
+	返回给用户				xx.html		需要渲染的参数
+		render(request,'模板文件的路径',{'dicname':dic})
+		redirect('路由定义的url或其他网站地址')
+		HttpResponse('str')
+		
+	文件上传
+		obj = request.files.get()
+		obj.name,obj.chunks(),obj.size
+	
+		form 表单 ，上传文件属性
+		<form 特殊设置></form>
+		
+4. 模板语言
+	render(requst,'模板文件的路径',{'obj':123,"k1":[1,2,3,4],'k2':{'name':'zy','age':'31'}})
+	<h1>{{ obj }}</h1>
+	<h1>{{ obj.k1.1 }}</h1>  = 2
+ 	
+	{{ for i in obj.k1}}
+		{{ i }}
+		{{ endfor }}
+	<h1>{{ obj.k2.name }}</h1> = zy
+	
+	字典循环
+	{{ % for k in obj.k2.keys %}}
+		{{k}}
+	{{ %endfor% }}	
+
+	{{ % for v in obj.k2.values %}}
+		{{v}}
+	{{ %endfor% }}	
+	
+	{{ % for k,v in obj.k2.item%}}
+		{{k}}-{{v}}
+	{{ %endfor% }}
+
+5.DB  ORM(关系对象映射)
+	a.创建类和字段修改数据库和结构
+		class User(models.Model)：
+			id = models.IntegerField(primary_key=True) # 不用加长度，报错，无用
+			name = CharField(max_length=32,null=True)
+			
+		python manage.py makemigrations
+		python manage.py migrate
+		
+		#settings 加入 appname 注册app
+		 
+		
+    b.操作
+		增
+			
+			models.User.objects.create(id='1',name='xxx')
+			dic = {
+				'1':'11',
+				'2':'22'
+			}
+			models.User.objects.create(**dic)
+			
+			obj = models.User(user='aaa')
+			obj.save()
+		删
+			models.User.objects.filter(条件).delete()
+			models.User.objects.all().delete()
+		改
+			models.User.objects.filter(name='bbb').update(username='bbb')
+			id>1 更新name为 ccc
+			models.User.objects.filter(id__gt=1).update(username='ccc')
+		
+		查
+			filter 也可以使用字典替代  **dicname
+			dic = {'name':'aaa','age__gt':'20')
+			models.User.Objects.filter(**dic)
+			models.User.Objects.filter(**kwargs)
+			
+			models.User.objects.fiter(id=1,name='aaa').first()
+			models.User.objects.fiter(id__gt=1).first()
+			models.User.objects.fiter(id__lt=1).first()
+			models.User.objects.fiter(id__gte=1).first()
+			models.User.objects.fiter(id__lte=1).first()
+			
+			v1 = models.Business.objects.all()
+			# v QuerySet
+			# 列表里面都是对象
+			# [obj1(id,caption,code),obj2(..), ..]
+			# return HttpResponse('abc')
+
+			v2 = models.Business.objects.all().values('id', 'caption')
+			# select id,caption from cmdb_business
+			# v1 QuerySet,列表里面元素为字典
+			# [{'id':1,'caption':'运维部'},{},{}]
+
+			v3 = models.Business.objects.all().values_list('id', 'caption')
+			# v3 Queryset
+			# [(1,运维部)，(2,开发部), ..]
+			return render(request, 'business.html', {'v1': v1, 'v2': v2, 'v3': v3})
+			
+			# 获取到一个对象，如果不存在直接就报错
+			# 尽量用filter(id=1).first() 获取不报错方式替代get
+			models.Business.objects.get(id=1)
+			
+			# 如果存在就返回对象，不存在返回None
+			models.Business.objects.filter(id=1).first()
+					
+		外键:
+			class UserType(models.Model):
+				caption = models.CharField(max_length=32)
+			
+			# 1.普通用户
+			# 2.vip用户
+			# 3.游客
+			
+			class User(models.Model):
+				name = models.CharField(max_length=50)
+				age = models.IntegerField()				
+				user_type = models.ForeignKey(
+					"UserType",to_field='id # 
+				) # 约束
+			    生成的user_type只是一个对象，真正生成的是user_type_id
+				
+			真正存储的是
+			  name  age  user_type_id
+			# 张扬  18 3 
+			# 张扬a 18 2
+			# 张扬b 18 
