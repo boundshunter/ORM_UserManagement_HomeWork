@@ -25,4 +25,9 @@ def business(request):
 
 def host(request):
     v1 = models.Host.objects.all()
-    return render(request, 'host.html', {'v1': v1})
+    v2 = models.Host.objects.filter(nid__gt=0).values('nid', 'hostname', 'b_id', 'b__caption')
+    for row in v2:
+        print(row['nid'], row['hostname'], row['b_id'], row['b__caption'])
+
+    v3 = models.Host.objects.filter(nid__gt=0).values_list('nid', 'hostname', 'b_id', 'b__caption')
+    return render(request, 'host.html', {'v1': v1, 'v2': v2, 'v3': v3})

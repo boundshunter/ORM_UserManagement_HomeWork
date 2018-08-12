@@ -5,6 +5,7 @@
     <title>Title</title>
 </head>
 <body>
+    <h1>详细信息一 (对象)</h1>
     <table border="1">
         <thead>
             <tr>
@@ -25,6 +26,39 @@
             {% endfor %}
         </tbody>
     </table>
-
+    <h1>详情二连表查询  values 双 __的使用 (字典)</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>域名</th>
+                <th>业务线名称</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in v2 %}
+            <tr hid="row.nid" bid="row.b_id">
+                <td>{{ row.hostname }}</td>
+                <td>{{ row.b__caption }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>详情三连表查询 value_list 双 __的使用 (元组)</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>域名</th>
+                <th>业务线名称</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in v3 %}
+            <tr hid="row.0" bid="row.2">
+                <td>{{ row.1 }}</td>
+                <td>{{ row.3 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

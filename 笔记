@@ -1,0 +1,11 @@
+models.Host.objects 想跨表都需要 双下划线 '__'
+
+跨表操作，取business中的caption，需要__ django里面会自动将__处理为跨表操作，b带表business对象，但是不可以用b.caption，报错！！！
+v2 = models.Host.objects.filter(nid__gt=0).values('nid', 'hostname', 'b_id', 'b__caption')
+v2 的类型，QuerySet:   [ {}, {}, {}..] 列表套字典，每行数据为一个字典
+v3 = models.Host.objects.filter(nid__gt=0).valuelist('nid', 'hostname', 'b_id', 'b__caption')
+v3 type list  html中  row in v3     v3.1 = hostname   v3.3= b__caption
+循环v2
+    for row in v2:
+        print(row['nid'],row['hostname'], row['b_id', row['b__caption']]
+
