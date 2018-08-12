@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
-# from django.db import models
+import json
 from cmdb import models
 # Create your views here.
 
@@ -24,10 +24,66 @@ def business(request):
 
 
 def host(request):
-    v1 = models.Host.objects.all()
-    v2 = models.Host.objects.filter(nid__gt=0).values('nid', 'hostname', 'b_id', 'b__caption')
-    for row in v2:
-        print(row['nid'], row['hostname'], row['b_id'], row['b__caption'])
+    if request.method == "GET":
+        v1 = models.Host.objects.all()
+        v2 = models.Host.objects.filter(nid__gt=0).values('nid', 'hostname', 'b_id', 'b__caption')
+        # for row in v2:
+        #     print(row['nid'], row['hostname'], row['b_id'], row['b__caption'])
+        v3 = models.Host.objects.filter(nid__gt=0).values_list('nid', 'hostname', 'b_id', 'b__caption')
+        b_list = models.Business.objects.all()
+        return render(request, 'host.html', {'v1': v1, 'v2': v2, 'v3': v3, 'b_list': b_list})
+    elif request.method == 'POST':
+        h = request.POST.get('hostname')
+        i = request.POST.get('ip')
+        p = request.POST.get('port')
+        b = request.POST.get('b_id')
+        print(h, i, p, b)
+        models.Host.objects.create(hostname=h, ip=i, port=p, b_id=b)
+        return redirect('/cmdb/host')
 
-    v3 = models.Host.objects.filter(nid__gt=0).values_list('nid', 'hostname', 'b_id', 'b__caption')
-    return render(request, 'host.html', {'v1': v1, 'v2': v2, 'v3': v3})
+
+# def commit_ajax(request):
+#     h = request.POST.get('hostname')
+#     i = request.POST.get('ip')
+#     p = request.POST.get('port')
+#     b = request.POST.get('b_id')
+#     return HttpResponse("ok")
+
+
+# def test_ajax(request):
+#     h = request.POST.get('hostname')
+#     i = request.POST.get('ip')
+#     p = request.POST.get('port')
+#     b = request.POST.get('bid')
+#     print(h, i, p, b)
+#
+#     if h and len(h)>5:
+#         models.Host.objects.create(hostname=h, ip=i, port=p, b_id=b)
+#         return HttpResponse("ok")
+#     else:
+#         return HttpResponse(h+" is to short")
+
+def test_ajax(request):
+    ret = {'status': None, 'error':None, 'data':None}
+    try:
+        h = request.POST.get('hostname')
+        i = request.POST.get('ip')
+        p = request.POST.get('port')
+        b = request.POST.get('bid')
+        print(h, i, p, b)
+
+        if h and len(h)>5:
+            models.Host.objects.create(hostname=h, ip=i, port=p, b_id=b)
+            # return HttpResponse("ok")
+            ret['status'] = True
+            ret['data'] = "OK"
+        else:
+            # return HttpResponse(h+" is to short")
+            ret['staus'] = False
+            ret['error'] = "hostname is too short"
+    except Exception as e:
+        ret['status'] = False
+        ret['error'] = "请求错误"
+
+    return HttpResponse(json.dumps(ret))
+

@@ -9,3 +9,59 @@ v3 type list  html中  row in v3     v3.1 = hostname   v3.3= b__caption
     for row in v2:
         print(row['nid'],row['hostname'], row['b_id', row['b__caption']]
 
+
+    html for循环
+        forloop.counter
+        forloop.couter0
+
+
+
+    需要渲染用render
+    不需要渲染的 redirect
+
+
+ajax html 使用  替代form
+    ajax 使用 id 定位标签取值
+$(function () {
+    $("#ajax_submit").click(function(){
+                $.ajax({
+                    url: '/cmdb/test_ajax/',
+                    type: 'POST',
+                    data: {'hostname': $('#hostname').val(),  # 根据标签中的id 获取值，传入给/cmdb/test_ajax路由函数
+                        'ip':$('#ip').val(),                  # 传入的结果，使用$(id).val()获取，views函数使用key取值
+                        'port': $('#port').val(),
+                        'bid': $('#bid').val(),
+                    },
+                    success: function(rt){                    # views 函数 返回状态 = rt，rt可以用任意字符替换
+                        if(rt=='ok'){
+                            location.reload();                # 刷新页面
+                        }else{
+                            alert(rt)                         # 弹出警告窗口
+                        }
+                    }
+                })
+            })
+    })
+
+
+Ajax
+            就是用ajax，来处理请求
+            $.ajax
+
+            下面方法内部都调用 $.ajax方法，只是替换type
+            $.get(url='xx',data='{}',success='xx')
+            $.getjson
+            $.post
+            字符串转换对象
+            var obj = JSON.parse(return_result)
+
+            JSON.stringify(obj) 对象转换成字符串
+            JSON.parse(str)     字符串转换成对象
+
+            建议，永远让服务器端返回个字典，服务器端返回之前处理
+                return HttpResponse(json.dumps(dict))
+
+                html接收端ajax
+                    obj = JSON.parse(服务器端返回的str)
+
+                    获取字典值，obj.key

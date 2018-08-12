@@ -88,7 +88,7 @@ DATABASES = {
     'NAME':'cmdb',
     'USER': 'jfsu',
     'PASSWORD': 'dongao.com123',
-    'HOST': '127.0.0.1',
+    'HOST': '10.0.1.110',
     'PORT': '3306',
     }
 }
