@@ -2,27 +2,10 @@ from django.db import models
 
 # Create your models here.
 
-#
-# class GroupInfo(models.Model):
-#     uid = models.AutoField(primary_key=True)
-#     caption = models.CharField(max_length=64)
-#     ctime = models.DateTimeField(auto_now_add=True)
-#     uptime = models.DateTimeField(auto_now=True)
-#
-#
-# class UserInfo(models.Model):
-#     username = models.CharField(max_length=64, primary_key=True)
-#     password = models.CharField(max_length=64)
-#     gender = models.IntegerField(choices=[(0, '男'), (1, '女')], default=0)
-#     age = models.IntegerField()
-#     job = models.CharField(max_length=64)
-#     ctime = models.DateTimeField(auto_now_add=True)
-#     uptime = models.DateTimeField(auto_now=True)
-
-
 class Business(models.Model):
     caption = models.CharField(max_length=32)
-    code = models.CharField(max_length=16,default='SA')
+    code = models.CharField(max_length=16, default='SA')
+
 
 class Host(models.Model):
     # 自动生成id主键列 不写的话
@@ -33,3 +16,12 @@ class Host(models.Model):
     # 主机分配业务线
     b = models.ForeignKey(to='Business', to_field='id', on_delete=True)
 
+
+class Application(models.Model):
+    name = models.CharField(max_length=32)
+    r = models.ManyToManyField("Host")
+
+# class HostToApp(models.Model):
+#     hobj = models.ForeignKey(to='Host', to_field='nid', on_delete=True)
+#     aobj = models.ForeignKey(to='Application', to_field='id', on_delete=True)
+#

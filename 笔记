@@ -65,3 +65,62 @@ Ajax
                     obj = JSON.parse(服务器端返回的str)
 
                     获取字典值，obj.key
+
+
+多对多关系表：
+    一、自定义关系表  自定义的，关系表可以随意创建列
+        ** 操作第三张表，创建数据
+            model.HostToApp.objects.create(hobj_id=1,aobj_id=2)
+
+            class Host(models.Model):
+                # 自动生成id主键列 不写的话
+                nid = models.AutoField(primary_key=True) # 自增
+                hostname = models.CharField(max_length=32, db_index=True)
+                ip = models.GenericIPAddressField(protocol='ipv4', db_index=True)  # ip类型实际是Char,默认支持ipv4,ipv6，可以指定protocol='ipv4'
+                port = models.IntegerField()
+                # 主机分配业务线
+                b = models.ForeignKey(to='Business', to_field='id', on_delete=True)
+
+            # 10 条
+
+            class Application(models.Model):
+                name = models.CharField(max_length=32)
+            # 5条
+
+            # 关系表
+            class HostToApp(models.Model):
+                hobj = models.ForeignKey(to='Host', to_field='nid', on_delete=True)
+                aobj = models.ForeignKey(to='Application', to_field='id', on_delete=True)
+
+    二、自动创建关系表  自动创建，只建立关系列
+       ** 无法直接对第三张关系表进行操作
+        class Host(models.Model):
+            # 自动生成id主键列 不写的话
+            nid = models.AutoField(primary_key=True) # 自增
+            hostname = models.CharField(max_length=32, db_index=True)
+            ip = models.GenericIPAddressField(protocol='ipv4', db_index=True)  # ip类型实际是Char,默认支持ipv4,ipv6，可以指定protocol='ipv4'
+            port = models.IntegerField()
+            # 主机分配业务线
+            b = models.ForeignKey(to='Business', to_field='id', on_delete=True)
+
+
+        class Application(models.Model):
+            name = models.CharField(max_length=32)
+            relation = models.ManyToManyField("Host")
+
+            obj = Application.objects.get(id=1)
+            obj.name
+            obj.relation.add(1) 表示在第三张表里增加一个1对应1，
+            obj.relation.add(*[1,2,3,4])  11  12  13  14 增加对应关系
+
+            obj.relation.remove(1)
+            obj.relation.remove(2,4)
+            obj.relation.remove(*[1,2,3])
+
+            obj.relation.clear() 只清理素有appid= 1的
+
+            最终保留关系设置
+            obj.relation.set([3,5,7]) 这个操作昨晚，表里面只会存在，1:3   1:5  1:7 ，其他都清除
+
+
+            obj.r.all()

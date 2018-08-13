@@ -87,3 +87,28 @@ def test_ajax(request):
 
     return HttpResponse(json.dumps(ret))
 
+
+def app(request):
+    if request.method == 'GET':
+        app_list = models.Application.objects.all()
+        host_list = models.Host.objects.all()
+        return render(request, 'app.html', {'app_list': app_list, 'host_list': host_list})
+    elif request.method == 'POST':
+        app_name = request.POST.get('app_name')
+        host_list = request.POST.getlist('host_list')
+        # print(app_name)
+        # print(host_list)
+        obj = models.Application.objects.create(name=app_name)
+        obj.r.add(*host_list)
+        return redirect("/cmdb/app/")
+
+
+def ajax_app(request):
+    ret = {'status': True, 'error': None, 'data': None}
+    app_name = request.POST.get('app_name')
+    # ******* 传入列表，使用getlist *******
+    host_list = request.POST.getlist('host_list')
+    print(app_name, host_list)
+    obj = models.Application.objects.create(name=app_name)
+    obj.r.add(*host_list)
+    return HttpResponse(json.dumps(ret))

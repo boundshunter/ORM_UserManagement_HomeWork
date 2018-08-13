@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hide{
+            display: none;
+        }
+        .shade{
+            position: fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            opacity: 0.6;
+            background-color: cadetblue;
+            z-index: 9;
+        }
+        .popup{
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            width: 500px;
+            height: 400px;
+            border: 1px solid red;
+            background-color: white;
+            margin-top: -200px;
+            margin-left: -300px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <input id="add" type="button" value="添加">
+    </div>
+    <div class="shade hide"></div>
+    <div class="popup hide">
+        <form id="add_form" action="/cmdb/app/" method="post">
+            <input id="app_name" type="text" name="app_name" placeholder="app_name">
+
+            <div>
+                <select id="host_id" name="host_list" multiple>
+                    {% for op in host_list %}
+                        <option value={{ op.nid }}>{{ op.hostname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p>
+                <input type="submit" value="确认">
+                <input id="add_submit_ajax" type="button" value="Ajax提交">
+                <input id="cancel" type="button" value="取消">
+            </p>
+            <p><span id="error_msg" style="color: #c0e3ff;;"></span></p>
+        </form>
+    </div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>应用名称</th>
+                <th>应用列表</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in app_list %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>
+                        {% for host in row.r.all %}
+                            <span class="host_tag">{{ host.hostname }}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="/static/jquery-3.3.1.min.js"></script>
+    <script>
+        $(function () {
+            $("#add").click(function () {
+                $(".shade, .popup").removeClass('hide');
+            });
+            $("#cancel").click(function (){
+                $(".shade, .popup").addClass('hide');
+            });
+            $("#add_submit_ajax").click(function(){
+                $.ajax({
+                    url: '/cmdb/ff_aj/',
+{#                    拿到 form 提交的所有数据#}
+                    data: $('#add_form').serialize(),
+{#                    data:{'username':'root','host_list':}#}
+                    type: 'POST',
+                    datatype: 'JSON',
+                    traditional: true,
+                    success: function(obj){
+                        location.reload()
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>

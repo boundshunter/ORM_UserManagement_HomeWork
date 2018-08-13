@@ -20,6 +20,8 @@ from cmdb import views
 urlpatterns = [
     path('business/', views.business),
     path('host/', views.host),
-    # path('commit_ajax/', views.commit_ajax),
-    path('test_ajax/', views.test_ajax)
+    path('test_ajax/', views.test_ajax),
+    path('ff_aj/', views.ajax_app),
+    re_path('app/', views.app),
+
 ]
