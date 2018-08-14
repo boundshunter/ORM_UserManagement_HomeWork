@@ -17,6 +17,16 @@
             background-color: cadetblue;
             z-index: 9;
         }
+        .modal_ed{
+            position: fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            opacity: 0.6;
+            background-color: cadetblue;
+            z-index: 9;
+        }
         .popup{
             position: fixed;
             top: 40%;
@@ -39,7 +49,6 @@
     <div class="popup hide">
         <form id="add_form" action="/cmdb/app/" method="post">
             <input id="app_name" type="text" name="app_name" placeholder="app_name">
-
             <div>
                 <select id="host_id" name="host_list" multiple>
                     {% for op in host_list %}
@@ -55,6 +64,26 @@
             <p><span id="error_msg" style="color: #c0e3ff;;"></span></p>
         </form>
     </div>
+    <div class="modal_ed hide">
+        <form id="form_ed" action="/cmdb/app/" method="POST">
+            <input type="text" name="nid" style="display: none;">
+            <input type="text" name="app" placeholder="应用名称">
+            <div>
+                <select id="host_id" name="host_list" multiple>
+                    {% for op in host_list %}
+                        <option value={{ op.nid }}>{{ op.hostname }}</option>
+                    {% endfor %}
+                </select>
+                <input type="button" id="ajax_submit_edit" value="确认编辑">
+            </div>
+            <p>
+                <input type="submit" value="确认">
+{#                <input id="add_submit_ajax" type="button" value="Ajax提交">#}
+                <input id="cancel" type="button" value="取消">
+            </p>
+            <p><span id="error_msg" style="color: #c0e3ff;;"></span></p>
+        </form>
+    </div>
     <table border="1">
         <thead>
             <tr>
@@ -64,12 +93,15 @@
         </thead>
         <tbody>
             {% for row in app_list %}
-                <tr>
+                <tr aid="row.id">
                     <td>{{ row.name }}</td>
                     <td>
                         {% for host in row.r.all %}
-                            <span class="host_tag">{{ host.hostname }}</span>
+                            <span class="host_tag" hid="{{ host.nid }}">{{ host.hostname }}</span>
                         {% endfor %}
+                    </td>
+                    <td>
+                        <a id='edit' class="edit" >编辑</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -85,6 +117,22 @@
             $("#cancel").click(function (){
                 $(".shade, .popup").addClass('hide');
             });
+
+            $(".edit").click(function () {
+                $(".edit_modal, .popup").removeClass('hide');
+{#                当前点击编辑 标签的父标签的向上的兄弟标签的所有孩子标签(each循环)#}
+                $(this).parent().prev().children().each(function(){
+{#                    获取span标签内容#}
+{#                    var text = $(this).text();#}
+{#                    select 标签.val ，单选拿到一个值，多选拿到的是一个列表#}
+                    var hid_list = [];
+                    var hid = $(this).attr('hid');
+                    hid_list.push(hid);
+{#                    console.log(hid_list)#}
+                });
+{#                val设置值id为默认选中的列表ID,点编辑默认选中#}
+                $('#form_ed').find('select').val('host_list')
+            });
             $("#add_submit_ajax").click(function(){
                 $.ajax({
                     url: '/cmdb/ff_aj/',
@@ -98,7 +146,12 @@
                         location.reload()
                     }
                 })
-            })
+            });
+{#            $(".edit").click(function(){#}
+{#                点击编辑，弹出对话框,隐藏当前应用的id#}
+{#                当前应用名字放入对话框，当前应用已经选中的机器在select中选中#}
+{##}
+{#            })#}
         })
     </script>
 </body>
